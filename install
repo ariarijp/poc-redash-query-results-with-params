@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -eux
+git clone https://github.com/getredash/setup.git
+cp src/setup/setup.sh.patch setup/
+cd setup; \
+git checkout cb47626b6823cbafac407b3e8991e97f53121f6e; \
+patch -p1 < setup.sh.patch; \
+sudo bash ./setup.sh

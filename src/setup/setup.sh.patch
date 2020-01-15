@@ -1,0 +1,44 @@
+diff --git a/setup.sh b/setup.sh
+index 24790e8..c56c764 100644
+--- a/setup.sh
++++ b/setup.sh
+@@ -22,6 +22,12 @@ install_docker(){
+     sudo usermod -aG docker $USER
+ }
+ 
++build_image() {
++    cd ../
++    sudo docker build . -t ariarijp/redash
++    cd ./setup
++}
++
+ create_directories() {
+     if [[ ! -e $REDASH_BASE_PATH ]]; then
+         sudo mkdir -p $REDASH_BASE_PATH
+@@ -51,6 +57,7 @@ create_config() {
+     echo "REDASH_COOKIE_SECRET=$COOKIE_SECRET" >> $REDASH_BASE_PATH/env
+     echo "REDASH_SECRET_KEY=$SECRET_KEY" >> $REDASH_BASE_PATH/env
+     echo "REDASH_DATABASE_URL=$REDASH_DATABASE_URL" >> $REDASH_BASE_PATH/env
++    echo "REDASH_ADDITIONAL_QUERY_RUNNERS=redash.query_runner.query_results_with_params" >> $REDASH_BASE_PATH/env
+ }
+ 
+ setup_compose() {
+@@ -60,7 +67,8 @@ setup_compose() {
+     cd $REDASH_BASE_PATH
+     GIT_BRANCH="${REDASH_BRANCH:-master}" # Default branch/version to master if not specified in REDASH_BRANCH env var
+     wget https://raw.githubusercontent.com/getredash/setup/${GIT_BRANCH}/data/docker-compose.yml
+-    sed -ri "s/image: redash\/redash:([A-Za-z0-9.-]*)/image: redash\/redash:$LATEST_VERSION/" docker-compose.yml
++    #sed -ri "s/image: redash\/redash:([A-Za-z0-9.-]*)/image: redash\/redash:$LATEST_VERSION/" docker-compose.yml
++    sed -ri "s/image: redash\/redash:([A-Za-z0-9.-]*)/image: ariarijp\/redash/" docker-compose.yml
+     echo "export COMPOSE_PROJECT_NAME=redash" >> ~/.profile
+     echo "export COMPOSE_FILE=/opt/redash/docker-compose.yml" >> ~/.profile
+     export COMPOSE_PROJECT_NAME=redash
+@@ -70,6 +78,7 @@ setup_compose() {
+ }
+ 
+ install_docker
++build_image
+ create_directories
+ create_config
+ setup_compose
+\ No newline at end of file
